@@ -3,7 +3,7 @@ from models.valentim import valentim
 import json
 from models.model import Model
 
-with open('models/valentim/valentim_scenarios.json', 'rb') as fh:
+with open('../models/valentim/valentim_scenarios.json', 'rb') as fh:
     scenarios = json.load(fh)
 
 scenario = scenarios["scenario_3"]["case_1"]
