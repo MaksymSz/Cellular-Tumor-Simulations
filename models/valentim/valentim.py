@@ -68,34 +68,34 @@ def _change_state(lattice, probab_a, probab_p, probab_mu, neighbors_array, P_A, 
 
 
 @njit
-def _make_step(lattice, probab_a, probab_p, probab_mu, neighbors_array, P_A, P_P, P_S, P_MU, P_STC, p_rtc_init):
+def _make_step(lattice, neighbors_array, P_A, P_P, P_S, P_MU, P_STC, p_rtc_init):
     x, y = np.nonzero(lattice)
     indices = np.stack((x, y), axis=-1)
     shuffled_indices = np.random.permutation(indices)
+    probab_a, probab_p, probab_mu = _roll_probab(len(shuffled_indices))
 
-    for x, y in shuffled_indices:
-        if lattice[x, y] != P_STC and probab_a[x, y] < P_A:
+    for idx, (x, y) in enumerate(shuffled_indices):
+        if lattice[x, y] != P_STC and probab_a[idx] < P_A:
             lattice[x, y] = 0
             continue
 
         displacement_capacity = 8 - np.count_nonzero(lattice[x - 1:x + 2, y - 1:y + 2])
         if displacement_capacity == 0:
             continue
-
-        if probab_p[x, y] < P_P:
+        elif probab_p[idx] < P_P:
             neighbors = np.random.permutation(neighbors_array)
             for n_x, n_y in neighbors:
                 if 0 == lattice[x + n_x, y + n_y]:
                     if lattice[x, y] == P_STC:
                         lattice[x + n_x, y + n_y] = P_STC if random() < P_S else p_rtc_init
                     else:
-                        lattice[x, y] = max(lattice[x, y] - 1, 0)
+                        lattice[x, y] = lattice[x, y] - 1
                         lattice[x + n_x, y + n_y] = lattice[x, y]
                     break
-        elif probab_mu[x, y] < P_MU:
+        elif probab_mu[idx] < P_MU:
             neighbors = np.random.permutation(neighbors_array)
             for n_x, n_y in neighbors:
-                if lattice[x + n_x, y + n_y] == 0:
+                if 0 == lattice[x + n_x, y + n_y]:
                     lattice[x + n_x, y + n_y], lattice[x, y] = lattice[x, y], 0
                     break
         continue
@@ -136,9 +136,9 @@ class ValentimModel(Model):
 
     def make_step(self):
         self.step += 1
-        self.probab_a, self.probab_p, self.probab_mu = _roll_probab(self.lattice.shape)
+        # self.probab_a, self.probab_p, self.probab_mu = _roll_probab(self.lattice.shape)
         self.lattice = _make_step(
-            self.lattice, self.probab_a, self.probab_p, self.probab_mu,
+            self.lattice,
             self.neighbors_array, self.P_A, self.P_P, self.P_S,
             self.P_MU, self.P_STC, self.p_rtc_init
         )

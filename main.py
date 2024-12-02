@@ -1,4 +1,3 @@
-import pickle
 from collections import defaultdict
 from time import time
 from models.valentim import valentim
@@ -12,12 +11,15 @@ with open('models/valentim/valentim_scenarios.json', 'rb') as fh:
     scenarios = json.load(fh)
 
 M = 64
-days = 20
+days = 225
 steps = 24 * days
 SCENARIO_NUM = 3
 CASES_NUM = 4
-CASES_OFFSET = 0
+CASES_OFFSET = 3
 TRIALS_NUM = 3
+# print(np.arange(0, steps, 10))
+# print(np.arange(0, steps, 100) // 24)
+# exit()
 
 colors = 'red blue orange green'.split()
 results = {f"case_{i}": defaultdict(list) for i in range(1, 5)}
@@ -50,7 +52,7 @@ def plot(cell_type, dst=None, logx=False):
         std = np.std(arr, axis=0)
         arr = np.mean(arr, axis=0)
         plt.plot(np.arange(steps), arr, label=r"$p_{max}=$" + f"{scenario["P_MAX"]}", color=colors[i - 1])
-        plt.fill_between(np.arange(steps), arr - std, arr + std, color=colors[i - 1], alpha=0.2)
+        plt.fill_between(np.arange(steps), arr - std, arr + std, color=colors[i - 1], alpha=0.3)
 
     plt.yscale("log")
     plt.ylim(bottom=0.9)
@@ -58,8 +60,8 @@ def plot(cell_type, dst=None, logx=False):
     if logx:
         plt.xscale("log")
     plt.xlabel("Time (days)")
-    plt.ylabel(f"{cell_type.upper()} count")
-    plt.title(f"Evolution of {cell_type.upper()}s")
+    plt.ylabel(f"{cell_type.capitalize()} count")
+    plt.title(f"Evolution of {cell_type.capitalize()}s")
     plt.legend()
     if dst:
         plt.savefig(dst)
@@ -72,30 +74,30 @@ def make_report(path, logx=False):
         "timestamp": timestamp,
         "scenario_num": SCENARIO_NUM,
     }
-    os.mkdir(path / f"{str(timestamp)}")
+
     for i in range(1 + CASES_OFFSET, CASES_NUM + 1):
         res = results[f"case_{i}"]
         case = {}
         for cc in 'rtc stc'.split():
             arr = np.array(res[cc])
 
-            # arr = np.sort(arr, axis=0)
+            arr = np.sort(arr, axis=0)
             std = np.std(arr, axis=0)
             mean = np.mean(arr, axis=0)
-            # print(np.max(arr[:, -1]))
+            print(np.max(arr[:, -1]))
             case[f"{cc}_max"] = int(np.max(arr))
             case[f"{cc}_max_std"] = float(np.max(arr, axis=1).std())
             case[f"{cc}_final"] = float(mean[-1])
             case[f"{cc}_final_std"] = float(std[-1])
-            with open(path / f"{str(timestamp)}" / f"case_{i}__{cc.upper()}.pickle", "wb") as fh:
-                pickle.dump(case, fh)
 
-        # print(f"## CASE {i}")
-        # print(case["rtc_max"], case["rtc_max_std"])
-        # print(case["rtc_final"], case["rtc_final_std"])
-        # print(case["stc_max"], case["stc_max_std"])
-        # print(case["stc_final"], case["stc_final_std"])
+
+        print(f"## CASE {i}")
+        print(case["rtc_max"], case["rtc_max_std"])
+        print(case["rtc_final"], case["rtc_final_std"])
+        print(case["stc_max"], case["stc_max_std"])
+        print(case["stc_final"], case["stc_final_std"])
         report[f"case_{i}"] = case
+    os.mkdir(path / f"{str(timestamp)}")
     with open(path / f"{str(timestamp)}" / f"{str(timestamp)}.json", "w") as fh:
         json.dump(report, fh)
     plot("rtc", path / f"{str(timestamp)}" / f"rtc.pdf", logx=logx)
@@ -105,11 +107,13 @@ def make_report(path, logx=False):
 # plot("rtc")
 # plot("stc")
 
-# print(model.P_A)
-# print(model.P_P)
-# print(model.P_MU)
+print(model.P_A)
+print(model.P_P)
+print(model.P_MU)
 
 # model.plot_lattice()
 
 dst = Path("results")
 make_report(dst, logx=False)
+
+
