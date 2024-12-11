@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
 
 class Model(ABC):
-    
+    """
+    Abstract class for models
+    """
     @abstractmethod
     def plot_lattice(self):
         raise NotImplementedError
