@@ -14,7 +14,7 @@ with open('../models/valentim/valentim_scenarios.json', 'rb') as fh:
 M = 512
 days = 208
 steps = 24 * days
-SCENARIO_NUM = 3
+SCENARIO_NUM = 4
 CASES_NUM = 4
 CASES_OFFSET = 0
 TRIALS_NUM = 3
@@ -77,17 +77,13 @@ def make_report(path, logx=False):
     with open(path / f"{str(timestamp)}" / f"{str(timestamp)}.json", "w") as fh:
         json.dump(report, fh)
     with open(dst / f"{str(timestamp)}" / f"results.pkl", "wb") as fh:
-        json.dump(results, fh)
+        pickle.dump(results, fh)
     # plot("rtc", path / f"{str(timestamp)}" / f"rtc.pdf", logx=logx)
     # plot("stc", path / f"{str(timestamp)}" / f"stc.pdf", logx=logx)
 
 
 for i in range(1 + CASES_OFFSET, CASES_NUM + 1):
     scenario = scenarios[f"scenario_{SCENARIO_NUM}"][f"case_{i}"]
-    if i == 1:
-        M = 350
-    else:
-        M = 260
     for _ in range(TRIALS_NUM):
         model = valentim.ValentimModel(M, scenario)
         model.run(steps)

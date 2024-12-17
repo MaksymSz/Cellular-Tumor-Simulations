@@ -116,7 +116,7 @@ class ValentimModel(Model):
         self.P_MAX = run_params['P_MAX']
         self.P_A = self.DELTA_T * run_params['P_A']
         self.P_P = run_params['P_P']
-        self.P_S = run_params['P_S']
+        self.P_S = 0.03  #run_params['P_S']
         self.P_MU = self.MU * self.DELTA_T
         self.neighbors_array = np.array([(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)])
         self.p_rtc_init = self.P_MAX + 1
