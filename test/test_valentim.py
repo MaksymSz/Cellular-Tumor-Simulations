@@ -6,9 +6,9 @@ from models.model import Model
 with open('../models/valentim/valentim_scenarios.json', 'rb') as fh:
     scenarios = json.load(fh)
 
-scenario = scenarios["scenario_2"]["case_1"]
+scenario = scenarios["scenario_3"]["case_1"]
 
-M = 64
+M = 300
 model: Model = valentim.ValentimModel(M, scenario)
 
 
