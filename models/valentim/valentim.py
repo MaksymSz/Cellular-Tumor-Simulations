@@ -144,6 +144,7 @@ class ValentimModel(Model):
         )
 
     def reset(self):
+        self.step = 0
         self.STC_count = []
         self.RTC_count = []
         self.lattice = np.zeros(self.lattice.shape, dtype=int)
