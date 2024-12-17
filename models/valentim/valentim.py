@@ -39,7 +39,6 @@ def _generate_shuffled_indices(lattice):
 def _change_state(lattice, probab_a, probab_p, probab_mu, neighbors_array, P_A, P_P, P_S, P_MU, P_STC, p_rtc_init, x,
                   y):
     if lattice[x, y] != P_STC and probab_a[x, y] < P_A:
-        print('dead')
         lattice[x, y] = 0
         return lattice
 
@@ -136,7 +135,6 @@ class ValentimModel(Model):
 
     def make_step(self):
         self.step += 1
-        # self.probab_a, self.probab_p, self.probab_mu = _roll_probab(self.lattice.shape)
         self.lattice = _make_step(
             self.lattice,
             self.neighbors_array, self.P_A, self.P_P, self.P_S,
@@ -151,8 +149,6 @@ class ValentimModel(Model):
         self.lattice[self.M // 2, self.M // 2] = self.init_cell
 
     def _expand_lattice(self):
-        print('expanding lattice')
-
         lattice = self.lattice
         new_shape = (lattice.shape[0] + 10, lattice.shape[1] + 10)
         new_arr = np.zeros(new_shape, dtype=lattice.dtype)
@@ -172,12 +168,6 @@ class ValentimModel(Model):
             self.RTC_count.append(np.count_nonzero(self.lattice))
 
     def plot_lattice(self, plot_bar=False):
-        # colors = [(1 / i, 0, 0, 1) for i in range(self.P_MAX, 0, -1)]
-        # colors.append((240 / 255, 1, 0, 1))
-        # colors.insert(0, (0, 0, 0, 0))
-        # cmap = ListedColormap(colors)
-        # norm = BoundaryNorm(list(range(0, self.P_MAX + 2)), cmap.N)
-
         cmap = LinearSegmentedColormap.from_list('name', ['black', 'red'])
         cmap.set_under('white')
         cmap.set_over('yellow')
