@@ -23,6 +23,10 @@ class GhaemiModel(Model):
     - HEALTHY (int): State value for healthy cells.
     - CANCEROUS (int): State value for cancerous cells.
     - NECROTIC (int): State value for necrotic cells.
+    - cancers_at_time_step (list): Number of cancerous cells at each time step.
+    - necrotic_at_time_step (list): Number of necrotic cells at each time step.
+    - healthy_at_time_step (list): Number of healthy cells at each time step.
+    - sum_of_nutrients_at_time_step (list): Sum of nutrient concentrations at each time step.
 
     Methods:
     - reset(): Resets the lattice and nutrient matrix to their initial states.
@@ -38,12 +42,16 @@ class GhaemiModel(Model):
         self.HEALTHY = 0
         self.CANCEROUS = 1
         self.NECROTIC = 2
-
+        self.cancers_at_time_step = [4]
+        self.necrotic_at_time_step = [0]
+        self.healthy_at_time_step = [self.lattice_size ** 2 - 4]
+        self.sum_of_nutrients_at_time_step = [self.lattice ** 2 * self.params['I_nut']]
         self._init_matrices()
 
 
 
     def reset(self):
+        self._plot_simulation()
         self._init_matrices()
 
     def make_step(self):
@@ -78,6 +86,11 @@ class GhaemiModel(Model):
         self.lattice = new_lattice
         self.cur_step += 1
 
+        self.cancers_at_time_step.append(np.sum(self.lattice == self.CANCEROUS))
+        self.necrotic_at_time_step.append(np.sum(self.lattice == self.NECROTIC))
+        self.healthy_at_time_step.append(np.sum(self.lattice == self.HEALTHY))
+        self.sum_of_nutrients_at_time_step.append(np.sum(self.C_nut))
+
     def plot_lattice(self):
         plt.clf()
         cmap = ListedColormap(['green', 'red', 'black'])
@@ -86,13 +99,33 @@ class GhaemiModel(Model):
         plt.title("Tumor Growth Simulation, Step {}".format(self.cur_step))
         plt.pause(0.01)
 
+    def _plot_simulation(self):
+        plt.clf()
+        plt.plot(self.cancers_at_time_step, label='Cancerous')
+        plt.plot(self.necrotic_at_time_step, label='Necrotic')
+        plt.plot(self.healthy_at_time_step, label='Healthy')
+        plt.xlabel('Time Steps')
+        plt.ylabel('Number of Cells')
+        plt.legend()
+        plt.title('Cell Population Over Time')
+
+        plt.plot(self.sum_of_nutrients_at_time_step)
+        plt.xlabel('Time Steps')
+        plt.ylabel('Sum of Nutrient Concentrations')
+        plt.title('Nutrient Concentration Over Time')
+        plt.savefig('plots/plots.png')
+
+        plt.pause(0.01)
+
     def _init_matrices(self):
-            self.lattice = np.zeros((self.lattice_size, self.lattice_size), dtype=np.uint8)
-            self.C_nut = np.full((self.lattice_size, self.lattice_size), self.params['I_nut'], dtype=np.float64)
-            self.lattice[len(self.lattice) // 2, len(self.lattice) // 2] = self.CANCEROUS
-            self.lattice[len(self.lattice) // 2 + 1, len(self.lattice) // 2] = self.CANCEROUS
-            self.lattice[len(self.lattice) // 2, len(self.lattice) // 2 + 1] = self.CANCEROUS
-            self.lattice[len(self.lattice) // 2 + 1, len(self.lattice) // 2 + 1] = self.CANCEROUS
+        self.lattice = np.zeros((self.lattice_size, self.lattice_size), dtype=np.uint8)
+        self.C_nut = np.full((self.lattice_size, self.lattice_size), self.params['I_nut'], dtype=np.float64)
+        self.lattice[len(self.lattice) // 2, len(self.lattice) // 2] = self.CANCEROUS
+        self.lattice[len(self.lattice) // 2 + 1, len(self.lattice) // 2] = self.CANCEROUS
+        self.lattice[len(self.lattice) // 2, len(self.lattice) // 2 + 1] = self.CANCEROUS
+        self.lattice[len(self.lattice) // 2 + 1, len(self.lattice) // 2 + 1] = self.CANCEROUS
+        self.cancers_at_time_step = [4]
+
 
 
     def _get_neighbors(self, row, col):
