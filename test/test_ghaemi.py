@@ -23,8 +23,11 @@ def main():
 
     def update():
         model.make_step()
+    
+    def plot():
+        model.plot_simulation()
 
-    pycxsimulator.GUI().start(func=[initialize, observe, update])
+    pycxsimulator.GUI().start(func=[initialize, observe, update, plot])
 
 if __name__ == "__main__":
     main()

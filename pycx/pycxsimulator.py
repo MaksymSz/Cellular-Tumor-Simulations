@@ -1,68 +1,28 @@
-## "pycxsimulator.py"
-## Dynamic, interactive simulation GUI for PyCX
-##
-## Project website:
-## https://github.com/hsayama/PyCX
-##
-## Initial development by:
-## Chun Wong
-## email@chunwong.net
-##
-## Revisions by:
-## Hiroki Sayama
-## sayama@binghamton.edu
-##
-## Copyright 2012 Chun Wong
-## Copyright 2012-2019 Hiroki Sayama
-##
-## Simulation control & GUI extensions
-## Copyright 2013 Przemyslaw Szufel & Bogumil Kaminski
-## {pszufe, bkamins}@sgh.waw.pl
-##
-## Fixing errors due to "the grid and pack problem" by:
-## Toshihiro Tanizawa
-## tanizawa@ee.kochi-ct.ac.jp
-## began at 2016-06-15(Wed) 17:10:17
-## fixed grid() and pack() problem on 2016-06-21(Tue) 18:29:40
-##
-## various bug fixes and updates by Steve Morgan on 3/28/2020
-
 import matplotlib
+import platform
 
-# System check added by Steve Morgan
-import platform  # SM 3/28/2020
+if platform.system() == 'Windows':
+    backend = 'TkAgg'
+else:
+    backend = 'Qt5Agg'
+matplotlib.use(backend)
 
-if platform.system() == 'Windows':  # SM 3/28/2020
-    backend = 'TkAgg'  # SM 3/28/2020
-else:  # SM 3/28/2020
-    backend = 'Qt5Agg'  # SM 3/28/2020
-matplotlib.use(backend)  # SM 3/28/2020
-
-import matplotlib.pyplot as plt  # SM 3/28/2020
-
-## version check added by Hiroki Sayama on 01/08/2019
-import sys
-
-if sys.version_info[0] == 3:  # Python 3
-    from tkinter import *
-    from tkinter.ttk import Notebook
-else:  # Python 2
-    from Tkinter import *
-    from ttk import Notebook
-
-## suppressing matplotlib deprecation warnings (especially with subplot) by Hiroki Sayama on 06/29/2020
+import matplotlib.pyplot as plt
 import warnings
+import sys
 
 warnings.filterwarnings("ignore", category=matplotlib.MatplotlibDeprecationWarning)
 
+if sys.version_info[0] == 3:
+    from tkinter import *
+    from tkinter.ttk import Notebook
+else:
+    from Tkinter import *
+    from ttk import Notebook
+
 
 class GUI:
-
-    # Constructor
     def __init__(self, title='PyCX Simulator', interval=0, stepSize=1, parameterSetters=[]):
-
-        ## all GUI variables moved to inside constructor by Hiroki Sayama 10/09/2018
-
         self.titleText = title
         self.timeInterval = interval
         self.stepSize = stepSize
@@ -74,25 +34,19 @@ class GUI:
         self.modelFigure = None
         self.currentStep = 0
 
-        # initGUI() removed by Hiroki Sayama 10/09/2018
-
-        # create root window
         self.rootWindow = Tk()
-        self.statusText = StringVar(self.rootWindow, value=self.statusStr)  # at this point, statusStr = ""
-        # added "self.rootWindow" above by Hiroki Sayama 10/09/2018
+        self.statusText = StringVar(self.rootWindow, value=self.statusStr)
         self.setStatusStr("Simulation not yet started")
 
-        self.rootWindow.wm_title(self.titleText)  # titleText = 'PyCX Simulator'
+        self.rootWindow.wm_title(self.titleText)
         self.rootWindow.protocol('WM_DELETE_WINDOW', self.quitGUI)
         self.rootWindow.geometry('450x300')
         self.rootWindow.columnconfigure(0, weight=1)
         self.rootWindow.rowconfigure(0, weight=1)
 
         self.notebook = Notebook(self.rootWindow)
-        # self.notebook.grid(row=0,column=0,padx=2,pady=2,sticky='nswe') # commented out by toshi on 2016-06-21(Tue) 18:30:25
         self.notebook.pack(side=TOP, padx=2, pady=2)
 
-        # added "self.rootWindow" by Hiroki Sayama 10/09/2018
         self.frameRun = Frame(self.rootWindow)
         self.frameSettings = Frame(self.rootWindow)
         self.frameParameters = Frame(self.rootWindow)
@@ -103,38 +57,32 @@ class GUI:
         self.notebook.add(self.frameParameters, text="Parameters")
         self.notebook.add(self.frameInformation, text="Info")
         self.notebook.pack(expand=NO, fill=BOTH, padx=5, pady=5, side=TOP)
-        # self.notebook.grid(row=0, column=0, padx=5, pady=5, sticky='nswe')   # commented out by toshi on 2016-06-21(Tue) 18:31:02
 
         self.status = Label(self.rootWindow, width=40, height=3, relief=SUNKEN, bd=1, textvariable=self.statusText)
-        # self.status.grid(row=1,column=0,padx=5,pady=5,sticky='nswe') # commented out by toshi on 2016-06-21(Tue) 18:31:17
         self.status.pack(side=TOP, fill=X, padx=5, pady=5, expand=NO)
 
-        # -----------------------------------
         # frameRun
-        # -----------------------------------
-        # buttonRun
-        self.runPauseString = StringVar(self.rootWindow)  # added "self.rootWindow" by Hiroki Sayama 10/09/2018
+        self.runPauseString = StringVar(self.rootWindow)
         self.runPauseString.set("Run")
         self.buttonRun = Button(self.frameRun, width=30, height=2, textvariable=self.runPauseString,
                                 command=self.runEvent)
         self.buttonRun.pack(side=TOP, padx=5, pady=5)
         self.showHelp(self.buttonRun, "Runs the simulation (or pauses the running simulation)")
 
-        # buttonStep
         self.buttonStep = Button(self.frameRun, width=30, height=2, text='Step Once', command=self.stepOnce)
         self.buttonStep.pack(side=TOP, padx=5, pady=5)
         self.showHelp(self.buttonStep, "Steps the simulation only once")
 
-        # buttonReset
         self.buttonReset = Button(self.frameRun, width=30, height=2, text='Reset', command=self.resetModel)
         self.buttonReset.pack(side=TOP, padx=5, pady=5)
         self.showHelp(self.buttonReset, "Resets the simulation")
 
-        # -----------------------------------
-        # frameSettings
-        # -----------------------------------
-        can = Canvas(self.frameSettings)
+        self.buttonPlot = Button(self.frameRun, width=30, height=2, text='Plot', command=self.runPlotFunc)
+        self.buttonPlot.pack(side=TOP, padx=5, pady=5)
+        self.showHelp(self.buttonPlot, "Generates a plot based on the model state")
 
+        # frameSettings
+        can = Canvas(self.frameSettings)
         lab = Label(can, width=25, height=1, text="Step size ", justify=LEFT, anchor=W, takefocus=0)
         lab.pack(side='left')
 
@@ -159,9 +107,7 @@ class GUI:
 
         can.pack(side='top')
 
-        # --------------------------------------------
         # frameInformation
-        # --------------------------------------------
         scrollInfo = Scrollbar(self.frameInformation)
         self.textInformation = Text(self.frameInformation, width=45, height=13, bg='lightgray', wrap=WORD,
                                     font=("Courier", 10))
@@ -170,25 +116,17 @@ class GUI:
         scrollInfo.config(command=self.textInformation.yview)
         self.textInformation.config(yscrollcommand=scrollInfo.set)
 
-        # --------------------------------------------
         # ParameterSetters
-        # --------------------------------------------
         for variableSetter in self.parameterSetters:
             can = Canvas(self.frameParameters)
-
             lab = Label(can, width=25, height=1, text=variableSetter.__name__ + " ", anchor=W, takefocus=0)
             lab.pack(side='left')
-
             ent = Entry(can, width=11)
             ent.insert(0, str(variableSetter()))
-
             if variableSetter.__doc__ != None and len(variableSetter.__doc__) > 0:
                 self.showHelp(ent, variableSetter.__doc__.strip())
-
             ent.pack(side='left')
-
             can.pack(side='top')
-
             self.varEntries[variableSetter] = ent
 
         if len(self.parameterSetters) > 0:
@@ -204,13 +142,9 @@ class GUI:
             self.showHelp(self.buttonSaveParametersAndReset, "Saves the given parameter values and resets the model")
             self.buttonSaveParametersAndReset.pack(side='top', padx=5, pady=5)
 
-    # <<<<< Init >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
     def setStatusStr(self, newStatus):
         self.statusStr = newStatus
         self.statusText.set(self.statusStr)
-
-        # model control functions for changing parameters
 
     def changeStepSize(self, val):
         self.stepSize = int(val)
@@ -227,8 +161,6 @@ class GUI:
         self.saveParametersCmd()
         self.resetModel()
 
-    # <<<< runEvent >>>>>
-    # This event is envoked when "Run" button is clicked.
     def runEvent(self):
         self.running = not self.running
         if self.running:
@@ -252,7 +184,6 @@ class GUI:
             self.modelStepFunc()
             self.currentStep += 1
             self.setStatusStr("Step " + str(self.currentStep))
-            self.status.configure(foreground='black')
             if (self.currentStep) % self.stepSize == 0:
                 self.drawModel()
             self.rootWindow.after(int(self.timeInterval * 1.0 / self.stepSize), self.stepModel)
@@ -271,26 +202,34 @@ class GUI:
         self.running = False
         self.runPauseString.set("Run")
         self.modelInitFunc()
-        self.currentStep = 0;
+        self.currentStep = 0
         self.setStatusStr("Model has been reset")
         self.drawModel()
 
     def drawModel(self):
-        plt.ion()  # SM 3/26/2020
+        plt.ion()
         if self.modelFigure == None or self.modelFigure.canvas.manager.window == None:
-            self.modelFigure = plt.figure()  # SM 3/26/2020
+            self.modelFigure = plt.figure()
         self.modelDrawFunc()
         self.modelFigure.canvas.manager.window.update()
-        plt.show()  # bug fix by Hiroki Sayama in 2016 #SM 3/26/2020
+        plt.show()
+
+    def runPlotFunc(self):
+        if self.modelPlotFunc:
+            self.modelPlotFunc()
+            self.setStatusStr("Plot function executed")
+        else:
+            self.setStatusStr("No plot function defined")
 
     def start(self, func=[]):
-        if len(func) == 3:
+        if len(func) == 4:
             self.modelInitFunc = func[0]
             self.modelDrawFunc = func[1]
             self.modelStepFunc = func[2]
-            if (self.modelStepFunc.__doc__ != None and len(self.modelStepFunc.__doc__) > 0):
+            self.modelPlotFunc = func[3]
+            if self.modelStepFunc.__doc__:
                 self.showHelp(self.buttonStep, self.modelStepFunc.__doc__.strip())
-            if (self.modelInitFunc.__doc__ != None and len(self.modelInitFunc.__doc__) > 0):
+            if self.modelInitFunc.__doc__:
                 self.textInformation.config(state=NORMAL)
                 self.textInformation.delete(1.0, END)
                 self.textInformation.insert(END, self.modelInitFunc.__doc__.strip())
@@ -301,9 +240,9 @@ class GUI:
         self.rootWindow.mainloop()
 
     def quitGUI(self):
-        self.running = False  # HS 06/29/2020
+        self.running = False
         self.rootWindow.quit()
-        plt.close('all')  # HS 06/29/2020
+        plt.close('all')
         self.rootWindow.destroy()
 
     def showHelp(self, widget, text):
