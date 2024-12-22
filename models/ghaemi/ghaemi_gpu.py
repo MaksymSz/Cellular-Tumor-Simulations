@@ -128,6 +128,10 @@ class GhaemiModel(Model):
         self.HEALTHY = 0
         self.CANCEROUS = 1
         self.NECROTIC = 2
+        self.cancers_at_time_step = []
+        self.necrotic_at_time_step = []
+        self.healthy_at_time_step = []
+        self.sum_of_nutrients_at_time_step = []
         self._init_matrices()
 
     def reset(self):
@@ -161,6 +165,11 @@ class GhaemiModel(Model):
 
         self._nutrient_diffusion()
         self.cur_step += 1
+
+        self.cancers_at_time_step.append(np.sum(self.lattice == self.CANCEROUS))
+        self.necrotic_at_time_step.append(np.sum(self.lattice == self.NECROTIC))
+        self.healthy_at_time_step.append(np.sum(self.lattice == self.HEALTHY))
+        self.sum_of_nutrients_at_time_step.append(np.sum(self.c_nut))
         
 
     def plot_lattice(self):
@@ -218,3 +227,27 @@ class GhaemiModel(Model):
             new_nut[row_start:row_end, :] = block_mean
 
         self.c_nut = new_nut
+
+    def plot_simulation(self):
+        plt.figure(figsize=(10, 6))  
+        plt.plot(self.cancers_at_time_step, label='Cancerous')
+        plt.plot(self.necrotic_at_time_step, label='Necrotic')
+        plt.plot(self.healthy_at_time_step, label='Healthy')
+        plt.grid()
+        plt.xlabel('Time Steps')
+        plt.ylabel('Number of Cells')
+        plt.legend()
+        plt.title('Cell Population Over Time')
+        plt.show()
+        plt.savefig('plots/cells.png')
+
+        plt.figure(figsize=(10, 6))  
+        plt.plot(self.sum_of_nutrients_at_time_step)
+        plt.xlabel('Time Steps')
+        plt.ylabel('Sum of Nutrient Concentrations')
+        plt.grid()
+        plt.ylim(bottom=0)
+        plt.title('Nutrient Concentration Over Time')
+        plt.show()  
+        plt.savefig('plots/nutrients.png')
+
