@@ -137,6 +137,10 @@ class GhaemiModel(Model):
     def reset(self):
         self._init_matrices()
         self.cur_step = 0
+        self.cancers_at_time_step = []
+        self.necrotic_at_time_step = []
+        self.healthy_at_time_step = []
+        self.sum_of_nutrients_at_time_step = []
 
     def make_step(self):
         self.log_data()

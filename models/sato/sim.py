@@ -90,7 +90,7 @@ def step():
 
 def draw():
     global cells, current_step
-    plt.figure()
+    plt.clf()
     colors = {
         ('high', 'suppressive'): 'red',
         ('high', 'permissive'): 'orange',
@@ -116,7 +116,6 @@ def draw():
         Line2D([0], [0], marker='o', color='w', label='Low-Neutral', markerfacecolor='purple', markersize=10)
     ]
     plt.legend(handles=legend_elements, loc='upper right')
-    plt.show()
 
 # GUI for Parameter Adjustment
 def adjust_parameters():

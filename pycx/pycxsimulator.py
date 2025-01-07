@@ -1,5 +1,6 @@
 import matplotlib
 import platform
+import app
 
 if platform.system() == 'Windows':
     backend = 'TkAgg'
@@ -138,6 +139,18 @@ class GUI:
                                                        text="Save parameters to the model and reset the model")
             self.showHelp(self.buttonSaveParametersAndReset, "Saves the given parameter values and resets the model")
             self.buttonSaveParametersAndReset.pack(side='top', padx=5, pady=5)
+
+    def mainMenuEvent(self):
+        """Exit the GUI and return to the main menu."""
+        self.quitGUI()  # Quit the GUI
+        app.main()  # Call the main function in the app module
+
+    def quitGUI(self):
+        """Quit the GUI gracefully."""
+        self.running = False
+        self.rootWindow.quit()
+        plt.close('all')
+        self.rootWindow.destroy()
 
     def setStatusStr(self, newStatus):
         self.statusStr = newStatus
