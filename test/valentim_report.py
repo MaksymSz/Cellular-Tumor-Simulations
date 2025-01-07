@@ -12,12 +12,12 @@ with open('../models/valentim/valentim_scenarios.json', 'rb') as fh:
     scenarios = json.load(fh)
 
 M = 512
-days = 208
+days = 440
 steps = 24 * days
 SCENARIO_NUM = 4
 CASES_NUM = 4
 CASES_OFFSET = 0
-TRIALS_NUM = 3
+TRIALS_NUM = 5
 dst = Path("../results")
 
 colors = 'red blue orange green'.split()

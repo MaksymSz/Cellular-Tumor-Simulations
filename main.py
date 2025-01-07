@@ -14,7 +14,7 @@ with open('models/valentim/valentim_scenarios.json', 'rb') as fh:
 M = 64
 days = 20
 steps = 24 * days
-SCENARIO_NUM = 3
+SCENARIO_NUM = 4
 CASES_NUM = 4
 CASES_OFFSET = 0
 TRIALS_NUM = 3
