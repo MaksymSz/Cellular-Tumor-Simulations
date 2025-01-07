@@ -7,7 +7,7 @@ import tkinter as tk
 from tkinter import simpledialog
 
 parameters = {
-    "total_steps": 200,
+    "total_steps": 250,
     "initial_population": 50,
     "division_rate_high_sial": 0.3,
     "division_rate_low_sial": 0.1,
