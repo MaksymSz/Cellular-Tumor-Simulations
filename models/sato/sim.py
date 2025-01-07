@@ -6,7 +6,6 @@ from matplotlib.lines import Line2D
 import tkinter as tk
 from tkinter import simpledialog
 
-# Default Simulation Parameters
 parameters = {
     "total_steps": 200,
     "initial_population": 50,
@@ -32,7 +31,7 @@ class Cell:
         action = "none"
         division_rate = parameters["division_rate_high_sial"] if self.sial_level == 'high' else parameters["division_rate_low_sial"]
         effective_rate = division_rate * self.environment_effect()
-        
+
         if random.random() < effective_rate:
             action = "divide"
         elif random.random() < parameters["death_rate"]:
@@ -57,13 +56,15 @@ class Cell:
 cells = []
 cell_id_counter = 0
 current_step = 0
+cell_counts = []
 
 def initialize():
-    global cells, cell_id_counter, current_step
+    global cells, cell_id_counter, current_step, cell_counts
     cells = []
     cell_id_counter = 0
     current_step = 0
-    for _ in range(int(parameters["initial_population"])):  # Ensure integer conversion here
+    cell_counts = []
+    for _ in range(int(parameters["initial_population"])):  
         position = (random.uniform(0, 10), random.uniform(0, 10))
         environment = random.choice(['suppressive', 'permissive', 'neutral'])
         sial_level = random.choice(['high', 'low'])
@@ -71,7 +72,7 @@ def initialize():
         cell_id_counter += 1
 
 def step():
-    global cells, cell_id_counter, current_step
+    global cells, cell_id_counter, current_step, cell_counts
     new_cells = []
     current_step += 1
     for cell in cells:
@@ -87,6 +88,7 @@ def step():
             cell.sial_level = random.choice(['high', 'low'])
         new_cells.append(cell)
     cells = new_cells
+    cell_counts.append(len(cells))
 
 def draw():
     global cells, current_step
@@ -117,12 +119,21 @@ def draw():
     ]
     plt.legend(handles=legend_elements, loc='upper right')
 
+def plot_simulation():
+    global cell_counts
+    plt.figure()
+    plt.plot(range(len(cell_counts)), cell_counts, label='Cell Count Over Time')
+    plt.xlabel('Time Step')
+    plt.ylabel('Number of Cells')
+    plt.title('Simulation Summary: Cell Growth Over Time')
+    plt.legend()
+    plt.show()
+
 # GUI for Parameter Adjustment
 def adjust_parameters():
     for key in parameters:
         new_value = simpledialog.askfloat("Parameter Adjustment", f"Set value for {key} (current: {parameters[key]}):")
         if new_value is not None:
-            # Cast to int if the parameter should be an integer
             if key in ["initial_population", "total_steps"]:
                 parameters[key] = int(new_value)
             else:
