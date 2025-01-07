@@ -1,4 +1,4 @@
-import pycxsimulator
+from pycx import pycxsimulator
 import random
 import matplotlib.pyplot as plt
 import numpy as np
@@ -130,9 +130,11 @@ def adjust_parameters():
                 parameters[key] = new_value
 
 # GUI Setup
+"""
 root = tk.Tk()
 root.withdraw()  # Hide the main window
 if tk.messagebox.askyesno("Adjust Parameters", "Do you want to adjust simulation parameters?"):
     adjust_parameters()
 
 pycxsimulator.GUI().start(func=[initialize, step, draw])
+"""

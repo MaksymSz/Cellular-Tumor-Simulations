@@ -53,9 +53,6 @@ class GUI:
         self.frameInformation = Frame(self.rootWindow)
 
         self.notebook.add(self.frameRun, text="Run")
-        self.notebook.add(self.frameSettings, text="Settings")
-        self.notebook.add(self.frameParameters, text="Parameters")
-        self.notebook.add(self.frameInformation, text="Info")
         self.notebook.pack(expand=NO, fill=BOTH, padx=5, pady=5, side=TOP)
 
         self.status = Label(self.rootWindow, width=40, height=3, relief=SUNKEN, bd=1, textvariable=self.statusText)

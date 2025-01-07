@@ -91,6 +91,8 @@ class GhaemiModel(Model):
         self.healthy_at_time_step.append(np.sum(self.lattice == self.HEALTHY))
         self.sum_of_nutrients_at_time_step.append(np.sum(self.C_nut))
 
+        self.log_data()
+
     def plot_lattice(self):
         plt.clf()
         cmap = ListedColormap(['green', 'red', 'black'])
@@ -179,4 +181,12 @@ class GhaemiModel(Model):
             for col in range(1, self.lattice_size - 1):
                 neighborhood = C_nut[row-1:row+2, col-1:col+2]
                 new_nut[row, col] = np.mean(neighborhood)
-        return new_nut 
+        return new_nut
+    
+    def log_data(self):
+        if self.cur_step in {50, 100, 200}:
+            print(f"Time step: {self.time_step}")
+            print(f"Number of cancerous cells: {np.sum(self.lattice == self.CANCEROUS)}")
+            print(f"Number of necrotic cells: {np.sum(self.lattice == self.NECROTIC)}")
+            print(f"Number of healthy cells: {np.sum(self.lattice == self.HEALTHY)}")
+            print(f"Sum of nutrient concentrations: {np.sum(self.C_nut)}")

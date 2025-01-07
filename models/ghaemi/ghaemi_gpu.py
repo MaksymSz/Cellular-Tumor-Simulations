@@ -139,6 +139,7 @@ class GhaemiModel(Model):
         self.cur_step = 0
 
     def make_step(self):
+        self.log_data()
         start = time.time()
         random_vals = np.random.random((self.lattice_size, self.lattice_size))
         
@@ -161,7 +162,7 @@ class GhaemiModel(Model):
         self.lattice = d_new_lattice.copy_to_host()
         self.c_nut = d_c_nut.copy_to_host()
         end = time.time()
-        print("Time make_step: ", end - start)
+
 
         self._nutrient_diffusion()
         self.cur_step += 1
@@ -170,6 +171,8 @@ class GhaemiModel(Model):
         self.necrotic_at_time_step.append(np.sum(self.lattice == self.NECROTIC))
         self.healthy_at_time_step.append(np.sum(self.lattice == self.HEALTHY))
         self.sum_of_nutrients_at_time_step.append(np.sum(self.c_nut))
+
+     
         
 
     def plot_lattice(self):
@@ -181,7 +184,6 @@ class GhaemiModel(Model):
         plt.title("Tumor Growth Simulation, Step {}".format(self.cur_step))
         plt.pause(0.01)
         end = time.time()
-        print("Time plot: ", end - start)
 
     def plot_lattice_nutrients(self):
         start = time.time()
@@ -193,7 +195,6 @@ class GhaemiModel(Model):
         plt.title("Nutrient Distribution, Step {}".format(self.cur_step))
         plt.pause(0.01)
         end = time.time()
-        print("Time plot nutrients: ", end - start)
 
     def _init_matrices(self):
         self.lattice = np.zeros((self.lattice_size, self.lattice_size), dtype=np.uint8)
@@ -250,4 +251,12 @@ class GhaemiModel(Model):
         plt.title('Nutrient Concentration Over Time')
         plt.show()  
         plt.savefig('plots/nutrients.png')
+    
+    def log_data(self):
+        if self.cur_step in {0, 50, 100, 200, 300, 400}:
+            print(f"Time step: {self.cur_step}")
+            print(f"Number of cancerous cells: {np.sum(self.lattice == self.CANCEROUS)}")
+            print(f"Number of necrotic cells: {np.sum(self.lattice == self.NECROTIC)}")
+            print(f"Number of healthy cells: {np.sum(self.lattice == self.HEALTHY)}")
+            print(f"Sum of nutrient concentrations: {np.sum(self.c_nut)}")
 
