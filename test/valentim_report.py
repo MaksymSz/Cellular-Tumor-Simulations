@@ -1,3 +1,6 @@
+"""
+Collect data and generate figures for final report
+"""
 import pickle
 from collections import defaultdict
 from time import time
@@ -25,6 +28,15 @@ results = {f"case_{i}": defaultdict(list) for i in range(1, 5)}
 
 
 def plot(cell_type, dst=None, logx=False):
+    """
+       Generate and display plots for the evolution of cell counts.
+
+       Parameters:
+       - cell_type (str): Type of cell to plot ('rtc' or 'stc').
+       - dst (Path, optional): Destination to save the plot as a file.
+       - logx (bool, optional): Whether to use logarithmic scaling for x-axis.
+
+       """
     for i in range(1 + CASES_OFFSET, CASES_NUM + 1):
         scenario = scenarios[f"scenario_{SCENARIO_NUM}"][f"case_{i}"]
 
@@ -52,6 +64,13 @@ def plot(cell_type, dst=None, logx=False):
 
 
 def make_report(path, logx=False):
+    """
+    Generate a report summarizing simulation results.
+
+    Parameters:
+    - path (Path): Path to save the report and associated data.
+    - logx (bool, optional): Whether to use logarithmic scaling for x-axis in plots.
+    """
     timestamp = int(time())
     report = {
         "timestamp": timestamp,
