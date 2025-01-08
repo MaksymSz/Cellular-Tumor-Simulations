@@ -5,7 +5,7 @@ This project focuses on simulating the growth of cancer cells in the human body.
 
 1. Growth of non-clonogenic, clonogenic, and stem-cell-based tumors.
 2. The effects of apoptosis and environmental conditions on tumor progression.
-3. Probabilistic cellular automata and 3D tumor microenvironment modeling.
+3. Influence of nutrients on cancer growth. 
 
 ## Features
 - Simulate different types of cancer cell growth using cellular automata and probabilistic approaches.
