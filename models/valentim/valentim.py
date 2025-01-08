@@ -286,18 +286,19 @@ class ValentimModel(Model):
             self.STC_count.append((self.lattice == (self.P_MAX + 2)).sum())
             self.RTC_count.append(np.count_nonzero(self.lattice))
 
-    def plot_lattice(self, plot_bar=False):
+    def plot_lattice(self, plot_bar=False, dst=None):
         """
         Visualize the current lattice state using a colormap.
 
         Parameters:
             plot_bar (bool): Whether to include a color bar in the plot (optional).
+            dst (str): Destination where the plot should be saved (optional).
         """
         cmap = LinearSegmentedColormap.from_list('name', ['black', 'red'])
         cmap.set_under('white')
         cmap.set_over('yellow')
 
-        plt.cla()
+        plt.cla(), plt.clf()
         plt.imshow(self.lattice, cmap=cmap, vmin=1, vmax=self.p_rtc_init)
 
         if plot_bar:
@@ -310,4 +311,11 @@ class ValentimModel(Model):
         _stc_count = (self.lattice == (self.P_MAX + 2)).sum()
         plt.title(f"Day {self.step // 24}\n {_stc_count}")
         plt.tight_layout()
-        plt.show()
+        if dst:
+            plt.savefig(dst)
+        else:
+            plt.show()
+        plt.pause(0.01)
+
+    def plot_simulation(self, plot_bar=False, dst=None):
+        self.plot_lattice(plot_bar=plot_bar, dst=dst)
