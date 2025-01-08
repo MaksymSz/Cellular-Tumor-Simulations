@@ -317,5 +317,5 @@ class ValentimModel(Model):
             plt.show()
         plt.pause(0.01)
 
-    def plot_simulation(self, plot_bar=False, dst=None):
-        self.plot_lattice(plot_bar=plot_bar, dst=dst)
+    def plot_simulation(self):
+        self.plot_lattice(plot_bar=True, dst='plots/valentim_lattice')
