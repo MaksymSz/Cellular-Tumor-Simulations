@@ -318,4 +318,27 @@ class ValentimModel(Model):
         plt.pause(0.01)
 
     def plot_simulation(self):
-        self.plot_lattice(plot_bar=True, dst='plots/valentim_lattice')
+        rtc = np.array(self.RTC_count)
+        stc = np.array(self.STC_count)
+        rtc -= stc
+
+        plt.figure(figsize=(15, 10))
+        for arr, label in zip([rtc, stc], 'RTC STC'.split()):
+            arr = np.sort(arr, axis=0)
+            std = np.std(arr, axis=0)
+            mean = np.mean(arr, axis=0)
+            X = np.arange(self.step)
+
+            plt.plot(X, mean, label=f"{label} tumor cells")
+            plt.fill_between(X, mean - std, mean + std, alpha=0.2)
+
+        plt.yscale("log")
+        plt.ylim(bottom=0.9)
+        plt.xlabel("Simulation steps")
+        plt.ylabel(f"Cells count")
+        plt.title(f"Cell Population Over Time")
+        plt.legend()
+        plt.grid()
+        plt.tight_layout()
+        plt.savefig("plots/valentim_cells.pdf")
+        plt.show()

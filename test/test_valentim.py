@@ -9,7 +9,7 @@ with open('../models/valentim/valentim_scenarios.json', 'rb') as fh:
 scenario = scenarios["scenario_3"]["case_1"]
 
 M = 512
-model: Model = valentim.ValentimModel(M, scenario)
+model= valentim.ValentimModel(M, scenario)
 
 
 def initialize():
@@ -22,6 +22,10 @@ def observe():
 
 def update():
     model.make_step()
+
+
+def plot():
+    model.plot_simulation()
 
 
 pycxsimulator.GUI().start(func=[initialize, observe, update])
