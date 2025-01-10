@@ -25,9 +25,9 @@ def get_simulation_params():
         'CCT': 1,
         'P_P': 0.0417,
         'MU': 10,
-        'INIT_CELL': 'p_rtc_init',
+        'INIT_CELL': 'P_STC',
         'P_A': 0,
-        'P_S': 0,
+        'P_S': 0.01,
         'P_MAX': 10
     }
 

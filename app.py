@@ -12,7 +12,7 @@ def main():
         case 'Probabilistic Cellular Automata':
             model = GhaemiModel(400, params)
         case 'Model accounting for different types of cancer cells':
-            model = ValentimModel(64, params)
+            model = ValentimModel(300, params)
     if model:
         pycxsimulator.GUI().start(func=[model.reset, model.plot_lattice, model.make_step, model.plot_simulation])
     else:

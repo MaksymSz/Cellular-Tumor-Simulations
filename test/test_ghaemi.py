@@ -4,10 +4,10 @@ from pycx import pycxsimulator
 def main():
     params = {
         'K_CC': 3,  
-        'K_HH': 0.5, 
+        'K_HH': 1, 
         'K_NN': 3,  
         'I_nut': 400.0, 
-        'k': 7
+        'k': 2
     }
 
 
