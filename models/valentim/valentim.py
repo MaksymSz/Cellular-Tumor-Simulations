@@ -321,16 +321,13 @@ class ValentimModel(Model):
         rtc = np.array(self.RTC_count)
         stc = np.array(self.STC_count)
         rtc -= stc
-
-        plt.figure(figsize=(15, 10))
+        print(stc)
+        plt.figure(figsize=(8, 5))
         for arr, label in zip([rtc, stc], 'RTC STC'.split()):
-            arr = np.sort(arr, axis=0)
-            std = np.std(arr, axis=0)
-            mean = np.mean(arr, axis=0)
+            arr = np.sort(arr)
             X = np.arange(self.step)
 
-            plt.plot(X, mean, label=f"{label} tumor cells")
-            plt.fill_between(X, mean - std, mean + std, alpha=0.2)
+            plt.plot(X, arr, label=f"{label} tumor cells")
 
         plt.yscale("log")
         plt.ylim(bottom=0.9)
