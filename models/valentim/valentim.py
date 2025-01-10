@@ -236,12 +236,16 @@ class ValentimModel(Model):
         self.RTC_count = []
         self.lattice[self.M // 2, self.M // 2] = self.init_cell
         self.step = 0
-
     def make_step(self):
+        self.step += 1
+        self._make_step()
+        self.STC_count.append((self.lattice == (self.P_MAX + 2)).sum())
+        self.RTC_count.append(np.count_nonzero(self.lattice))
+
+    def _make_step(self):
         """
         Perform a single simulation step, updating the lattice state.
         """
-        self.step += 1
         self.lattice = _make_step(
             self.lattice,
             self.neighbors_array, self.P_A, self.P_P, self.P_S,
@@ -252,6 +256,7 @@ class ValentimModel(Model):
         """
         Reset the simulation to its initial state.
         """
+        print('model reset')
         self.step = 0
         self.STC_count = []
         self.RTC_count = []
@@ -282,7 +287,7 @@ class ValentimModel(Model):
         """
         for i in tqdm(range(n_steps), desc=f"\033[32mSimulation progress"):
             self.step = i
-            self.make_step()
+            self._make_step()
             self.STC_count.append((self.lattice == (self.P_MAX + 2)).sum())
             self.RTC_count.append(np.count_nonzero(self.lattice))
 
@@ -320,8 +325,9 @@ class ValentimModel(Model):
     def plot_simulation(self):
         rtc = np.array(self.RTC_count)
         stc = np.array(self.STC_count)
+        print(rtc.shape, stc.shape)
         rtc -= stc
-        print(stc)
+        print("plot simulation")
         plt.figure(figsize=(8, 5))
         for arr, label in zip([rtc, stc], 'RTC STC'.split()):
             arr = np.sort(arr)
